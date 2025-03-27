@@ -1,0 +1,9 @@
+{
+	"description" : "Cannal Produções - Logs",
+	"name" : "ariellcannal/logs",
+	"type" : "project",
+	"license" : "MIT",
+	"require" : {
+		"php" : ">=8.0.0",
+	}
+}
