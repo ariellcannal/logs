@@ -8,7 +8,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"CANNALLogs\\Logs" : "Logs.php"
+			"CANNALLogs\\Logs\\" : "Logs.php"
 		}
 	},
     "minimum-stability": "dev",
