@@ -6,6 +6,11 @@
 	"require" : {
 		"php" : ">=8.0.0"
 	},
+	"autoload" : {
+		"psr-4" : {
+			"CANNALLogs\\Logs" : "Logs.php"
+		}
+	},
     "minimum-stability": "dev",
     "prefer-stable": true
 }
