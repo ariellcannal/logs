@@ -1,5 +1,5 @@
 <?php
-namespace CannalLogs;
+namespace CANNALLogs;
 
 class Logs
 {
