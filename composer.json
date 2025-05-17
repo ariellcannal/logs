@@ -1,5 +1,5 @@
 {
-	"description" : "Cannal Produções - Logs",
+	"description" : "CANNAL - Logs",
 	"name" : "ariellcannal/logs",
 	"type" : "project",
 	"license" : "MIT",
@@ -8,7 +8,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"CANNALLogs\\Logs\\" : "Logs.php"
+			"CANNALLogs\\" : "src/"
 		}
 	},
     "minimum-stability": "dev",
