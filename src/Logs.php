@@ -4,87 +4,118 @@ namespace CANNALLogs;
 class Logs
 {
 
-    private string $log_dir = '';
+    private string $baseDir = APPPATH . '/logs/';
 
-    private string $log_name = '';
+    private string $logDir = '';
 
-    public function __construct($log_dir = null)
+    private string $logName = '';
+
+    private string $logExt = 'log';
+
+    public function __construct(string $logDir = null, string $logName = null)
     {
-        $this->log_dir = $_SERVER['DOCUMENT_ROOT'] . '/application/logs/';
-        if ($log_dir && $this->check_path($log_dir)) {
-            return true;
-        } else {
-            $this->log_name = date('Y-m-d_H:i:s') . '.log';
-            return true;
+        if ($logDir && $this->checkLogDir($logDir)) {
+            $this->logDir = $logDir;
+        }
+        if ($logName) {
+            if ($this->checkLogName($logName)) {
+                $this->logName = $logName;
+            } else {
+                $this->logName = date('Y-m-d_H:i:s') . '.' . $this->logExt;
+            }
         }
     }
 
-    function check_path(string $path): bool
+    public function getBaseDir(): string
     {
-        if (is_file($path)) {
+        return $this->baseDir;
+    }
+
+    public function setBaseDir(string $baseDir): self
+    {
+        $this->baseDir = $baseDir;
+        return $this;
+    }
+
+    public function getLogDir(): string
+    {
+        return $this->logDir;
+    }
+
+    public function setLogDir(string $logDir): self
+    {
+        if ($this->checkLogDir($logDir)) {
+            $this->logDir = $logDir;
+            return $this;
+        }
+        return false;
+    }
+
+    public function getLogName(): string
+    {
+        return $this->logName;
+    }
+
+    public function setLogName(string $logName): self
+    {
+        if ($this->checkLogName($logName)) {
+            $this->logName = $logName;
+            return $this;
+        }
+        return false;
+    }
+
+    public function checkLogDir(string $path): bool
+    {
+        if (is_dir($this->baseDir . $path)) {
             return true;
-        }
-
-        $expl_dir = explode('/', $path);
-        $file_name = array_pop($expl_dir);
-        $log_name_tmp = explode('.', $file_name);
-        if (count($log_name_tmp) == 1 || (count($log_name_tmp) > 1 && end($log_name_tmp) != "log")) {
-            $file_name .= '.log';
-        }
-        unset($log_name_tmp);
-
-        $point_dir = $this->log_dir;
-        if (count($expl_dir) > 1 && ! is_dir(implode('/', $expl_dir))) {
-            foreach ($expl_dir as $subdir) {
-                if (! empty($subdir) && ! file_exists($point_dir . '/' . $subdir)) {
-                    if (! mkdir($point_dir . '/' . $subdir, 0755)) {
+        } else {
+            $parts = explode('/', $path);
+            $current = $this->baseDir;
+            foreach ($parts as $part) {
+                $current .= '/' . $part;
+                if (! empty($part) && ! is_dir($current)) {
+                    if (! mkdir($current, 0755)) {
                         return false;
                     }
                 }
-                $point_dir .= '/' . $subdir;
+            }
+            if (is_dir($this->baseDir . $path)) {
+                return true;
             }
         }
+        return false;
+    }
 
-        if (fopen($point_dir . '/' . $file_name, "a")) {
-            $this->log_name = str_replace($this->log_dir, '', $point_dir . '/' . $file_name);
+    function checkLogName(string $filename): bool
+    {
+        $ext = '.' . $this->logExt;
+        if (substr($filename, sizeof($filename) - sizeof($ext)) != $ext) {
+            $filename .= $ext;
+        }
+        if (is_file($this->baseDir . $this->logDir . $filename)) {
+            return true;
+        } else if (! $stream = fopen($this->baseDir . $this->logDir . $filename, 'a')) {
+            return false;
+        } else {
+            fclose($stream);
+        }
+
+        if (is_file($this->baseDir . $this->logDir . $filename)) {
             return true;
         }
+
         return false;
     }
 
     function write(string $level, string $message): bool
     {
-        if ($fp = @fopen($this->log_dir . $this->log_name, "a")) {
+        if ($fp = @fopen($this->baseDir . $this->logDir . $this->logName . '.' . $this->logExt, "a")) {
             $message = date('Y-m-d H:i:s') . ' [' . strtoupper($level) . '] ' . $message . PHP_EOL;
             fwrite($fp, $message);
             fclose($fp);
             return true;
         }
         return false;
-    }
-
-    function get_log_name(): string
-    {
-        return str_replace('.log', '', $this->log_name);
-    }
-
-    function set_log_name(string $log_name, bool $move_previous = false): bool
-    {
-        if ($this->log_name = $log_name) {
-            return true;
-        }
-
-        return $this->check_path($log_name);
-    }
-
-    function set_log_dir(string $dir): bool
-    {
-        $this->log_dir .= '/' . $dir;
-        return true;
-    }
-
-    function get_log_dir(): string
-    {
-        return $this->log_dir;
     }
 }
